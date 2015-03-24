@@ -13,10 +13,37 @@ MAX_RETRIES = 10
 # Functions
 
 def check_incoming_users(users_ip):
+    """
+    Main function to sniff ARP packets using Scapy
+    """
     while(True):
         sniff(prn = arp_count, filter = "arp")
+    
+def arp_count(pkt):
+    """
+    This function is called everytime Scapy sniffs a packet. If the packet contains no ARP data, then it enters the exception and leaves.
+    If it does contain ARP data, then it checks if the MAC address (pkt[ARP].hwsrc) is in the known devices list (dictionary.csv) and
+    reports the user as online sending a "1" to the corresponding Ubidots variable.
+    """
+    try:
+        if pkt[ARP].hwsrc in users:
+            device = users[pkt[ARP].hwsrc]
+            users_ip[device] = pkt[ARP].psrc
+            print "ARP request received from " + device + ". Device saved to known hosts"
+            var = get_var_by_name(device, ds)
+            var.save_value({"value": 1,"context":{"type":"ARP Request"}})
+            return
+        else:
+            #print "HW address not found"
+            return
+    except:
+        return
 
 def check_outgoing_users(users_ip):
+    """
+    Loops in the users_ip dict and sends an ICMP (ping) packet to each host, to check if it's still online.
+    After MAX_RETRIES is reports the host as offline, sending a "0" to the corresponding Ubidots variable.
+    """
     conf.verb = 0
     timeout_counters = {}
     while(True):
@@ -38,26 +65,10 @@ def check_outgoing_users(users_ip):
 #                   del users_ip[user]    # Uncomment this line if you dont want to keep pinging the IP addresses that were reported offline
         time.sleep(1)
 
-def arp_count(pkt):
-
-    try:
-        if pkt[ARP].hwsrc in users:
-            device = users[pkt[ARP].hwsrc]
-            users_ip[device] = pkt[ARP].psrc
-            print "ARP request received from " + device + ". Device saved to known hosts"
-            var = get_var_by_name(device, ds)
-            var.save_value({"value": 1,"context":{"type":"ARP Request"}})
-            return
-        else:
-            #print "HW address not found"
-            return
-    except:
-        return
-
 def get_var_by_name(var_name, ds):
-
-    # Search for a variable in a datasource. If found, returns the variable. If not found, returns None
-
+    """
+    Search for a variable in a datasource. If found, returns the variable. If not found, returns None
+    """
     for var in ds.get_variables():
 
         if var.name == var_name:
@@ -93,10 +104,12 @@ if __name__ == '__main__':
             var = get_var_by_name(row[0], ds)
             var.save_value({"value": 0})
 
-    # Launch Processes
+    # Prepare and Launch Processes in Parallel
+    
     manager = Manager()
-    users_ip = manager.dict()
-
+    users_ip = manager.dict() 
+    # This dict needs to be shared between both processes, so we use manager.dict() and pass it as an argument
+    
     p1 = Process(target=check_incoming_users, args=(users_ip,))
     p2 = Process(target=check_outgoing_users, args=(users_ip,))
 
