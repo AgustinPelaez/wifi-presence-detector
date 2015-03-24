@@ -41,8 +41,8 @@ def arp_count(pkt):
 
 def check_outgoing_users(users_ip):
     """
-    Loops in the users_ip dict and sends an ICMP (ping) packet to each host, to check if it's still online.
-    After MAX_RETRIES is reports the host as offline, sending a "0" to the corresponding Ubidots variable.
+    Loops users_ip dict and sends an ICMP (ping) packet to each device to check if it's still online.
+    After MAX_RETRIES it reports the device as offline, sending a "0" to the corresponding Ubidots variable.
     """
     conf.verb = 0
     timeout_counters = {}
