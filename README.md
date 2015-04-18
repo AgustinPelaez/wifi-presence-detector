@@ -13,16 +13,21 @@ We strongly recommend using Wicd to manage the wifi connection.
 2. Install the required libraries
 =================================
 
-sudo apt-get install python-setuptools 
+sudo apt-get install python-setuptools
+
 sudo easy_install pip
+
 sudo pip install scapy
+
 sudo pip install ubidots
 
 3. Code the program!
 ====================
 
 pi@raspberrypi ~ $ mkdir presence_detector
+
 pi@raspberrypi ~ $ cd presence_detector/
+
 pi@raspberrypi ~/access_control $ nano presence_detector.py
 
 Paste the code into the file.
