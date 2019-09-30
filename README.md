@@ -51,4 +51,4 @@ Put this API Key into the code (line ~73).
 
 The script will automatically create a Datasource with the value of the variable "office" in the Python script. Then it will create a variable for each new device that is detected in the network AND that is also listed in "dictionary.csv".
 
-Once you see this data, go to your Ubidots dashboard and create "Indicator" widgets to see if a person is inside or outside the office!
+Once you see this data, go to your Ubidots dashboard and create "<b>Indicator</b>" widgets to see if a person is inside or outside the office!
