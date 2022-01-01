@@ -19,7 +19,6 @@ def check_incoming_users(users_ip):
 
 
 def check_outgoing_users(users_ip):
-    conf.verb = 0
     timeout_counters = {}
     while(True):
         # Issue ARP Ping to all network
@@ -75,7 +74,7 @@ def get_var_by_name(var_name, ds):
         var = ds.create_variable({"name": var_name, "unit": "."})
         return var
     except:
-        print "Couldn't get variables from DS"
+        print ("Couldn't get variables from DS")
         return
 
 if __name__ == '__main__':
@@ -96,21 +95,21 @@ if __name__ == '__main__':
 
             if ds is None:
                 ds = api.create_datasource({"name": office})
-        print "Connected to Ubidots, will send data to Ubidots data source called: " + ds.name
+        print ("Connected to Ubidots, will send data to Ubidots data source called: " + ds.name)
 
     except:
-        print "Ds not found nor created"
+        print ("Ds not found nor created")
 
     # Load dictionary from CSV file
 
-    with open('/root/dictionary.csv','rb') as f:
+    with open('dictionary.csv','rt') as f:
         reader = csv.reader(f)
         for row in reader:
             users[row[1]] = row[0]
             var = get_var_by_name(row[0], ds)
             var.save_value({"value": 0})
 
-    print "List of users loaded."
+    print ("List of users loaded.")
 
     # Launch Processes
     manager = Manager()
